@@ -1,8 +1,6 @@
 #ifndef BASICSTRUCT_H
 #define BASICSTRUCT_H
-
 #endif // BASICSTRUCT_H
-
 #include <iostream>
 #include "qnamespace.h"
 #include <windows.h>
@@ -13,41 +11,42 @@
 #include <map>
 #include <queue>
 #include <random>
-//实现了向量，点，边的struct定义
-//初始创建了graph类
 using namespace std;
-//可能没用
-struct Vector{
+//可能没用,向量的类定义，vector可能有歧义，这里使用了向量的另一个名字
+struct directed_quantity{
     double x,y;
-    Vector(){
+   directed_quantity(){
         x=0;y=0;
     }
-    Vector(double a,double b){
+   directed_quantity(double a,double b){
         x=a;
         y=b;
     }
     //向量运算
-    friend Vector operator-(Vector a,Vector b){
-        return Vector(a.x-b.x,a.y-b.y);
+    friend directed_quantity operator-(directed_quantity a,directed_quantity b){
+        return directed_quantity(a.x-b.x,a.y-b.y);
     }
-    friend Vector operator+(Vector a,Vector b){
-        return Vector(a.x+b.x,a.y+b.y);
+    friend directed_quantity operator+(directed_quantity a,directed_quantity b){
+        return directed_quantity(a.x+b.x,a.y+b.y);
     }
 };
+//定义点
 struct Point{
     double x,y;
+    //计算两个点之间的距离
     friend double distance(Point a,Point b){
-        return sqrt(pow(a.x-b.x,2)+pow(a.y-b.y,2));//两点间的距离
+        return sqrt(pow(a.x-b.x,2)+pow(a.y-b.y,2));
     }
     //两个点形成向量
-    friend Vector operator -(Point a,Point b){
-        return Vector(a.x-b.x,a.y-b.x);
+    friend directed_quantity operator -(Point a,Point b){
+        return directed_quantity(a.x-b.x,a.y-b.x);
     }
 };
+//定义路径
 struct Edge{
     int P1,P2;
-    double length,reallength;
-    unsigned capacity,flow;
+    double length,reallength;//路的长度，时间，考虑后续名字改一下
+    unsigned capacity,flow;//车容量，流量
     Edge(){flow=length=0;}
     Edge(int a,int b,double dis,int cap,int f=0):P1(a),P2(b),length(dis),capacity(cap),flow(f){}
 };
