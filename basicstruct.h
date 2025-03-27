@@ -51,4 +51,15 @@ struct Edge{
     Edge(){flow=length=0;}
     Edge(int a,int b,double dis,int cap,int f=0):P1(a),P2(b),length(dis),capacity(cap),flow(f){}
 };
-class Graph{};
+class Graph{
+    //线程id
+    bool Randflg;
+    //点的个数
+    unsigned int PointNums;
+    //流量线程
+    HANDLE RandFlowThread;
+public:
+    //存储
+    //存图,pair<int,int>
+    vector<vector<pair<int,int>>>G;
+};
