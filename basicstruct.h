@@ -51,4 +51,48 @@ struct Edge{
     Edge(){flow=length=0;}
     Edge(int a,int b,double dis,int cap,int f=0):P1(a),P2(b),length(dis),capacity(cap),flow(f){}
 };
-class Graph{};
+class Graph{
+    bool Randflg;
+    unsigned int PointNums;
+public:vector<vector<pair<int,int>>>G;//first记录其目的点标号, second记录该边标号
+    vector<Point>P;//存放点的信息，标号从1开始
+    vector<Edge>E;//存放边的信息，标号从0开始
+private:
+    vector<bool>visited;
+    void dfs(int now,int father)
+    {
+        visited[now]=true;
+        cout<<now<<' '<<father<<endl;
+        for(auto [to,edge]:G[now])
+        {
+            if(visited[to])
+                continue;
+            //printf("%d ---> %d : %d/%d (%lf)\n", n, to, E[e].flow, E[e].capacity, 1.0 * E[e].flow / E[e].capacity);
+            cout << now << " ---> " << to << " : " << E[edge].flow << "/" << E[edge].capacity << " (" << (1.0 * E[edge].flow / E[edge].capacity) << ")" << endl;
+            dfs(to,now);
+        }
+    }
+public:Graph(int n)
+    {
+
+    }
+    ~Graph(){}
+    // 返回输入点附近的100个点的标号
+    vector<int> get100points(Point p)
+    {
+        vector<int>ret;
+        priority_queue<pair<double,int>>pq;
+        for(int i=1;i<=(int)PointNums;i++)
+        {
+            pq.push({distance(P[i],p),i});
+            if(pq.size()>100)pq.pop();
+        }
+        // 把最近的至多100个点放入ret返回.
+        while(!pq.empty()){
+            auto x = pq.top();
+            pq.pop();
+            ret.push_back(x.second);
+        }
+        return ret;
+    }
+};
