@@ -5,6 +5,7 @@
 #include "qnamespace.h"
 #include <windows.h>
 #include <cmath>
+#include<climits>
 #include <vector>
 #include <ctime>
 #include <algorithm>
@@ -46,7 +47,7 @@ struct Point{
 //定义路径
 struct Edge{
     int P1,P2;
-    double length,reallength;//路的长度，时间，考虑后续名字改一下
+    double length,realtime;//路的长度，时间，考虑后续名字改一下
     unsigned capacity,flow;//车容量，流量
     Edge(){flow=length=0;}
     Edge(int a,int b,double dis,int cap,int f=0):P1(a),P2(b),length(dis),capacity(cap),flow(f){}
@@ -94,5 +95,94 @@ public:Graph(int n)
             ret.push_back(x.second);
         }
         return ret;
+    }
+    // 返回邻接链表的头指针
+    vector<vector<pair<int, int>>>::iterator GraphHead()
+    {
+        return G.begin();
+    }
+    //返回点的数目
+    unsigned GetPointNums()
+    {
+        return PointNums;
+    }
+    //返回边的数目
+    unsigned GetEdgeNums()
+    {
+        return (unsigned)E.size();
+    }
+    // 返回点池的首指针
+    vector<Point>::iterator PointHead()
+    {
+        return P.begin();
+    }
+    // 返回边池的首指针
+    vector<Edge>::iterator EdgeHead()
+    {
+        return E.begin();
+    }
+    void Time(vector<Edge>::iterator E,Graph *G)
+    {
+        for(int i=0;i<(int)G->GetPointNums();i++)
+        {
+            if(E[i].flow<=E[i].capacity)
+                E[i].realtime=E[i].length/50;
+            else {
+                double x=(double)E[i].flow/E[i].capacity;
+                E[i].realtime=E[i].length/50*(1+exp(x));
+            }
+        }
+    }
+    //返回最短路径
+    vector<int>dij(int start,int end,Graph *Gp,bool choice,double &distance,double & time)
+    {
+        time=0;
+        distance =0;
+        vector<int>path;
+        auto E=Gp->EdgeHead();
+        int n=Gp->GetPointNums();
+        auto G=Gp->GraphHead();
+        Time(E,Gp);
+        vector<double>dis(n+1,INT_MAX);
+        priority_queue<pair<double,pair<int,int>>>pq;
+        pq.push({0,{start,0}});
+        vector<bool>visited(n+1);
+        vector<int>father(n+1);
+        while(!pq.empty())
+        {
+            auto [len,cur]=pq.top();
+            auto [now,fa]=cur;
+            pq.pop();
+            if(visited[now])
+                continue;
+            father[now]=fa;
+            visited[now]=true;
+            dis[now]=-len;
+            for(auto [to,edge]:G[now])
+            {
+                if(visited[to])
+                    continue;
+                double l=0;
+                if(choice)
+                    l=len-E[edge].realtime;
+                else l=len-E[edge].length;
+                pq.push({l,{to,edge}});
+            }
+            if(now==end)
+            {
+                while(now!=start)
+                {
+                    path.push_back(father[now]);
+                    now=E[father[now]].P1;
+                }
+                for(int i=0;i<(int)path.size();i++)
+                {
+                    time+=E[path[i]].realtime;
+                    distance+=E[path[i]].length;
+                }
+                return path;
+            }
+        }
+        return path;
     }
 };
