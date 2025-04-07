@@ -13,7 +13,7 @@
 #include <queue>
 #include <random>
 using namespace std;
-//可能没用,向量的类定义，vector可能有歧义，这里使用了向量的另一个名字哈哈哈哈
+//可能没用,向量的类定义，vector可能有歧义，这里使用了向量的另一个名字
 
 struct directed_quantity{
     double x,y;
@@ -52,6 +52,30 @@ struct Edge{
     Edge(){flow=length=0;}
     Edge(int a,int b,double dis,int cap,int f=0):P1(a),P2(b),length(dis),capacity(cap),flow(f){}
 };
+//定义随机数函数，生成的随机数为0到range-1
+unsigned long long myrand(unsigned long long range = 0) {
+    // 每个线程拥有独立的随机数生成器实例，避免多线程竞争
+    thread_local std::mt19937_64 engine = []() {
+        // 使用真随机数设备生成种子序列
+        std::random_device rd;
+        std::vector<unsigned int> seed_data(4); // 使用4个随机数作为种子
+        for (auto& elem : seed_data) {
+            elem = rd();
+        }
+        std::seed_seq seq(seed_data.begin(), seed_data.end());
+        return std::mt19937_64(seq);
+    }();
+
+    if (range == 0) {
+        // 直接返回64位随机数
+        return engine();
+    } else {
+        // 使用均匀分布确保数值分布无偏
+        std::uniform_int_distribution<unsigned long long> dist(0, range - 1);
+        return dist(engine);
+    }
+}
+//定义图
 class Graph{
     bool Randflg;
     unsigned int PointNums;
@@ -73,6 +97,7 @@ private:
             dfs(to,now);
         }
     }
+
 public:Graph(int n)
     {
 
