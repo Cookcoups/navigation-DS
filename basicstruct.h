@@ -13,7 +13,7 @@
 #include <queue>
 #include <random>
 using namespace std;
-//可能没用,向量的类定义，vector可能有歧义，这里使用了向量的另一个名字
+//可能没用,向量的类定义，vector可能有歧义，这里使用了向量的另一个名字111
 
 struct directed_quantity{
     double x,y;
