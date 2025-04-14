@@ -13,7 +13,7 @@
 #include <queue>
 #include <random>
 using namespace std;
-//可能没用,向量的类定义，vector可能有歧义，这里使用了向量的另一个名字
+//可能没用,向量的类定义，vector可能有歧义，这里使用了向量的另一个名字111
 
 struct directed_quantity{
     double x,y;
@@ -75,6 +75,24 @@ unsigned long long myrand(unsigned long long range = 0) {
         return dist(engine);
     }
 }
+namespace Solution {
+bool KDflag;
+void KDTree(vector<Point>&p,int l,int r)
+{
+    if(l==r)return;
+    int mid=l+(r-l)/2;
+    nth_element(p.begin()+l,p.begin()+mid,p.begin()+r,[](Point a,Point b){
+        if(KDflag)return a.x<b.x;
+        else return a.y<b.y;
+    });
+    bool nowflag=KDflag;
+    KDflag=(!nowflag);
+    KDTree(p,l,mid);
+    KDflag=(!nowflag);
+    KDTree(p,mid+1,r);
+}
+}
+
 //定义图
 class Graph{
     bool Randflg;
@@ -83,6 +101,17 @@ public:vector<vector<pair<int,int>>>G;//first记录其目的点标号, second记
     vector<Point>P;//存放点的信息，标号从1开始
     vector<Edge>E;//存放边的信息，标号从0开始
 private:
+    void addedge(int u,int v)
+    {
+        double dis=distance(P[u],P[v]);
+        double rand_scale = myrand(RAND_MAX) * 1.0 / RAND_MAX + 1;  // [1.0, 2.0)
+        int cap = static_cast<int>(rand_scale * dis / 20) + myrand(33) + 88;
+        //int cap=(int)(myrand(RAND_MAX)*1.0/RAND_MAX+1)*(int)(dis)/20+myrand(37)+79;
+        E.push_back(Edge(u,v,dis,cap,cap*1/2));
+        G[u].push_back({v,(int)E.size()-1});
+        E.push_back(Edge(v,u,dis,cap,cap*1/2));
+        G[v].push_back({u,(int)E.size()-1});
+    }
     vector<bool>visited;
     void dfs(int now,int father)
     {
@@ -100,7 +129,63 @@ private:
 
 public:Graph(int n)
     {
-
+        int row =sqrt(n),col=n/row;
+        n=row*col;
+        PointNums=n;
+        int sqn=pow(n,0.5);
+        G.resize(n+1);
+        P.resize(n+1);
+        srand(time(0));
+        int rlimit=RAND_MAX/row,climit=RAND_MAX/col;
+        for(int i=1;i<=row;i++)
+        {
+            for(int j=1;j<=col;j++)
+            {
+                int now=j+(i-1)*col;
+                P[now].x=myrand(rlimit)+(i-1)*rlimit;
+                P[now].y=myrand(climit)+(j-1)*climit;
+            }
+        }
+        for(int i=1;i<=n;i++)
+        {
+            P[i].x+=1.0 * myrand(RAND_MAX) / ((int)RAND_MAX), P[i].y += 1.0 * myrand(RAND_MAX) / ((int)RAND_MAX);
+        }
+        Solution::KDTree(P,1,n);
+            int maxdis=max({distance(P[1],P[n]),distance(P[n/2],P[n]),distance(P[1],P[n/2])});
+        maxdis=pow(maxdis,0.7);
+            for(int i=2;i<=n;i++)
+        {
+            vector<pair<int,int>>vc;
+                int st=max(1,i-(int)pow(n,0.6));
+                for(int j=1;j<i;j++)
+            {
+                if(vc.size()<2)
+                        vc.push_back({(int)distance(P[i],P[j]),j});
+                else{
+                    int dis=distance(P[i],P[j]);
+                    if(dis<vc.front().first&&myrand(n)<sqn)
+                        continue;
+                    pair<int,int>now={dis,j};
+                    for(int k=0;k<(int)vc.size();k++)
+                    {
+                        if(vc[k].first>dis)
+                            swap(vc[k],now);
+                    }
+                    if(myrand(n)<sqn)
+                        swap(now,vc.back());
+                }
+                if(!vc.empty()&&(myrand(n)<sqn))
+                    vc.pop_back();
+                if(j<st)
+                    j+=pow(n,0.1);
+            }
+                for(auto [dis,to]:vc)
+            {
+                if(dis>maxdis&&myrand(n)>sqn)
+                        continue;
+                addedge(i,to);
+            }
+        }
     }
     ~Graph(){}
     // 返回输入点附近的100个点的标号
