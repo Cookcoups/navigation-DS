@@ -13,8 +13,8 @@
 #include <queue>
 #include <random>
 using namespace std;
-//可能没用,向量的类定义，vector可能有歧义，这里使用了向量的另一个名字111
 
+//可能没用,向量的类定义，vector可能有歧义，这里使用了向量的另一个名字directed_quantity
 struct directed_quantity{
     double x,y;
    directed_quantity(){
@@ -76,7 +76,9 @@ unsigned long long myrand(unsigned long long range = 0) {
     }
 }
 namespace Solution {
+//交换维度
 bool KDflag;
+//kd树
 void KDTree(vector<Point>&p,int l,int r)
 {
     if(l==r)return;
@@ -96,11 +98,12 @@ void KDTree(vector<Point>&p,int l,int r)
 //定义图
 class Graph{
     bool Randflg;
-    unsigned int PointNums;
+    unsigned int PointNums;//点的个数，用于初始化
 public:vector<vector<pair<int,int>>>G;//first记录其目的点标号, second记录该边标号
     vector<Point>P;//存放点的信息，标号从1开始
     vector<Edge>E;//存放边的信息，标号从0开始
 private:
+    //辅助函数，添加边，用在初始化
     void addedge(int u,int v)
     {
         double dis=distance(P[u],P[v]);
@@ -112,6 +115,7 @@ private:
         E.push_back(Edge(v,u,dis,cap,cap*1/2));
         G[v].push_back({u,(int)E.size()-1});
     }
+    //辅助函数，测试最短路径
     vector<bool>visited;
     void dfs(int now,int father)
     {
@@ -231,6 +235,7 @@ public:Graph(int n)
     {
         return E.begin();
     }
+    //时间最短路转换函数
     void Time(vector<Edge>::iterator E,Graph *G)
     {
         for(int i=0;i<(int)G->GetPointNums();i++)
@@ -295,4 +300,15 @@ public:Graph(int n)
         }
         return path;
     }
+//随机函数进行流分配
+    //还没写完
+    // DWORD WINAPI static RandFlow(LPVOID lpPaRameter){
+    //     Graph *This=(Graph *)lpPaRameter;
+    //     while(This->Randflg)
+    //     {for(int i=0;i<(int)This->E.size();i+=2)
+
+    //     }
+
+    }
+
 };
