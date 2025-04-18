@@ -99,6 +99,7 @@ void KDTree(vector<Point>&p,int l,int r)
 class Graph{
     bool Randflg;
     unsigned int PointNums;//点的个数，用于初始化
+    HANDLE RandFlowThread;
 public:vector<vector<pair<int,int>>>G;//first记录其目的点标号, second记录该边标号
     vector<Point>P;//存放点的信息，标号从1开始
     vector<Edge>E;//存放边的信息，标号从0开始
@@ -302,13 +303,38 @@ public:Graph(int n)
     }
 //随机函数进行流分配
     //还没写完
-    // DWORD WINAPI static RandFlow(LPVOID lpPaRameter){
-    //     Graph *This=(Graph *)lpPaRameter;
-    //     while(This->Randflg)
-    //     {for(int i=0;i<(int)This->E.size();i+=2)
+    DWORD WINAPI static RandFlow(LPVOID lpPaRameter){
+        Graph *This=(Graph *)lpPaRameter;
+        while(This->Randflg)
+        {for(int i=0;i<(int)This->E.size();i+=2)//遍历所有的边进行随机修改
+            {
+                This->E[i].flow+=((int)myrand()-(int)myrand())%((int)pow(This->E[i].flow,0.8)+1);
+                if(This->E[i].flow>100000000)//溢出处理
+                    This->E[i].flow=std::max(0u,This->E[i].flow+std::min(0u,(unsigned int)sqrt(This->E[i].capacity)));
+                if(This->E[i].flow>This->E[i].capacity*2)
+                    This->E[i].flow=std::min(This->E[i].capacity*2,This->E[i].flow-(int)sqrt(This->E[i].capacity*2));
+                This->E[i+1].flow=This->E[i].flow;
+            }
+            Sleep(1000);
 
-    //     }
+        }
 
     }
+    void StartRandFlow()
+    {
+        Randflg = 1;
+        // 把线程id放在类里, 到时候看一下怎么搞这个线程.
+        RandFlowThread = CreateThread(NULL, 0, RandFlow, this, 0, NULL);
+    }
+    void StopRandFlow()
+    {
+        Randflg = 0;
+    }
+    void dfsshow()
+    {
+        visited.resize(PointNums + 1, 0);
+        dfs(1, 0);
+    }
+
 
 };
