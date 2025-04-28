@@ -17,8 +17,7 @@ SOURCES += \
 HEADERS += \
     basicstruct.h \
     mainwindow.h \
-    mygraphicsview.h \
-    mythread.h
+    mygraphicsview.h
 
 FORMS += \
     mainwindow.ui
